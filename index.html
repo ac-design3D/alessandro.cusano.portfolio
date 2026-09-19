@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alessandro Cusano - Accesso Riservato</title>
+    <title>Alessandro Cusano - Restricted Access</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -39,21 +39,77 @@
             margin: 0 0 32px 0;
             font-weight: 500;
         }
-        .link-button {
-            display: flex;
-            align-items: center;
+        
+        /* Stili base per tutti i bottoni */
+        .link-button, .expandable-wrapper {
             background-color: #FFFFFF;
-            text-decoration: none;
-            color: #111;
-            padding: 8px;
             border-radius: 12px;
             margin-bottom: 16px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            text-decoration: none;
+            color: #111;
+        }
+        .link-button {
+            display: flex;
+            align-items: center;
+            padding: 8px;
             transition: transform 0.2s;
         }
         .link-button:hover {
             transform: scale(1.02);
         }
+        
+        /* Stili specifici per i menu a tendina (PDF) */
+        .expandable-wrapper {
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .expandable-wrapper .link-button {
+            margin-bottom: 0;
+            box-shadow: none;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+        .expandable-wrapper .link-button:hover {
+            background-color: #FAFAFA;
+        }
+        .preview-content {
+            max-height: 0;
+            opacity: 0;
+            transition: max-height 0.4s ease-out, opacity 0.3s ease-out;
+            background-color: #F8F9FA;
+            border-top: 1px solid #EEE;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .preview-content.open {
+            max-height: 600px;
+            opacity: 1;
+            padding-bottom: 16px;
+        }
+        .preview-iframe {
+            width: 100%;
+            height: 350px;
+            border: none;
+        }
+        .open-fullscreen {
+            margin-top: 12px;
+            padding: 8px 24px;
+            background-color: #111;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 24px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        .open-fullscreen:hover {
+            background-color: #333;
+        }
+
+        /* Elementi interni ai bottoni */
         .link-thumb {
             width: 50px;
             height: 50px;
@@ -83,13 +139,16 @@
             color: #999;
             font-weight: bold;
         }
+        
+        /* Social */
         .social-container {
             margin-top: 30px;
             display: flex;
             justify-content: center;
             gap: 20px;
         }
-        /* Stili della schermata di Password */
+
+        /* Schermata Password */
         #lock-screen {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -130,21 +189,22 @@
 </head>
 <body>
 
-    <!-- Schermata di Accesso -->
+    <!-- Schermata di Accesso in Inglese -->
     <div id="lock-screen">
         <img src="profilo.jpg" alt="Alessandro" class="profile-pic">
-        <h2 style="margin-bottom: 20px; font-size: 18px;">Inserisci il codice di accesso</h2>
-        <input type="password" id="pass-input" placeholder="Codice segreto">
-        <button onclick="sblocca()">Accedi</button>
-        <p id="error-msg">Codice non valido. Riprova.</p>
+        <h2 style="margin-bottom: 20px; font-size: 18px;">Enter access code</h2>
+        <input type="password" id="pass-input" placeholder="Passcode">
+        <button onclick="sblocca()">Enter</button>
+        <p id="error-msg">Invalid code. Please try again.</p>
     </div>
 
-    <!-- Contenuto Nascosto (Il tuo Linktree) -->
+    <!-- Contenuto Nascosto -->
     <div class="container" id="main-content" style="display: none;">
         <img src="profilo.jpg" alt="Alessandro Cusano" class="profile-pic">
         <h1>Alessandro Cusano</h1>
         <p class="subtitle">Product Designer | 3D Artist</p>
 
+        <!-- YouTube -->
         <a href="https://www.youtube.com/watch?v=7omXPAX_sn4" class="link-button" target="_blank">
             <img src="thumb-video.jpg" class="link-thumb" alt="Showreel">
             <div class="link-content">
@@ -153,23 +213,37 @@
             <div class="dots">⋮</div>
         </a>
 
-        <a href="portfolio.pdf" class="link-button" target="_blank">
-            <img src="thumb-port.jpg" class="link-thumb" alt="Portfolio">
-            <div class="link-content">
-                <div class="link-title">3D Modelling Portfolio</div>
-                <div class="link-subtitle">📄 PDF • Document</div>
+        <!-- Portfolio PDF -->
+        <div class="expandable-wrapper">
+            <div class="link-button" onclick="togglePreview('portfolio-preview')">
+                <img src="thumb-port.jpg" class="link-thumb" alt="Portfolio">
+                <div class="link-content">
+                    <div class="link-title">3D Modelling Portfolio</div>
+                    <div class="link-subtitle">📄 Click to preview</div>
+                </div>
+                <div class="dots">▼</div> 
             </div>
-            <div class="dots">⋮</div>
-        </a>
+            <div id="portfolio-preview" class="preview-content">
+                <iframe src="portfolio.pdf" class="preview-iframe"></iframe>
+                <a href="portfolio.pdf" target="_blank" class="open-fullscreen">Open in full screen</a>
+            </div>
+        </div>
 
-        <a href="cv.pdf" class="link-button" target="_blank">
-            <img src="thumb-cv.jpg" class="link-thumb" alt="CV">
-            <div class="link-content">
-                <div class="link-title">CV</div>
-                <div class="link-subtitle">📄 PDF • Document</div>
+        <!-- CV PDF -->
+        <div class="expandable-wrapper">
+            <div class="link-button" onclick="togglePreview('cv-preview')">
+                <img src="thumb-cv.jpg" class="link-thumb" alt="CV">
+                <div class="link-content">
+                    <div class="link-title">CV</div>
+                    <div class="link-subtitle">📄 Click to preview</div>
+                </div>
+                <div class="dots">▼</div>
             </div>
-            <div class="dots">⋮</div>
-        </a>
+            <div id="cv-preview" class="preview-content">
+                <iframe src="cv.pdf" class="preview-iframe"></iframe>
+                <a href="cv.pdf" target="_blank" class="open-fullscreen">Open in full screen</a>
+            </div>
+        </div>
 
         <div class="social-container">
             <a href="mailto:ac.design3D@gmail.com" style="color:#000;">
@@ -184,12 +258,24 @@
     <script>
         function sblocca() {
             var pass = document.getElementById("pass-input").value;
-            // La tua password è impostata a 1324
             if (pass === "1324") {
                 document.getElementById("lock-screen").style.display = "none";
                 document.getElementById("main-content").style.display = "block";
             } else {
                 document.getElementById("error-msg").style.display = "block";
+            }
+        }
+
+        function togglePreview(id) {
+            var element = document.getElementById(id);
+            if (element.classList.contains("open")) {
+                element.classList.remove("open");
+            } else {
+                var allPreviews = document.getElementsByClassName("preview-content");
+                for (var i = 0; i < allPreviews.length; i++) {
+                    allPreviews[i].classList.remove("open");
+                }
+                element.classList.add("open");
             }
         }
     </script>
